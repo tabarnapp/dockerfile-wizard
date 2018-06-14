@@ -3,12 +3,13 @@
 echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
 
 echo "RUN apt-get update"
+echo "RUN apt-get -y install zip"
 
 if [ ! -e $RUBY_VERSION_NUM ] ; then
     echo "RUN apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
     tar -xzvf ruby-$RUBY_VERSION_NUM.tar.gz && \
     cd ruby-$RUBY_VERSION_NUM/ && \
-    ./configure && \
+    ./configure --disable-install-doc && \
     make -j4 && \
     make install && \
     ruby -v"
@@ -33,6 +34,10 @@ if [ ! -e $PYTHON_VERSION_NUM ] ; then
     cd Python-$PYTHON_VERSION_NUM && \
     ./configure && \
     make install"
+
+    echo "RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+            python get-pip.py
+            "
 fi
 
 # if [ ! -e $PHP_VERSION_NUM ] ; then
@@ -133,4 +138,3 @@ RUN apt-get -y install libgconf-2-4 \
   && chmod +x /usr/local/bin/chromedriver"
 fi
 
-echo "RUN apt-get -y install zip"
