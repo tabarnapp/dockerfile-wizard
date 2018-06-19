@@ -12,14 +12,3 @@ fi
 if [ $POSTGRES_CLIENT = "true" ] ; then
     echo "RUN sudo apt-get -y install postgresql-client"
 fi
-
-# install bats for testing
-echo "RUN git clone https://github.com/sstephenson/bats.git \
-  && cd bats \
-  && ./install.sh /usr/local \
-  && cd .. \
-  && rm -rf bats"
-
-# install dependencies for tap-to-junit
-echo "RUN perl -MCPAN -e 'install TAP::Parser'"
-echo "RUN perl -MCPAN -e 'install XML::Generator'"
