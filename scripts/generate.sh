@@ -6,9 +6,14 @@ echo "RUN apt-get update"
 echo "RUN adduser --disabled-password --gecos '' docker"
 echo "RUN adduser docker sudo"
 echo "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
+echo "RUN mkdir /home/docker"
+echo "RUN chown docker:docker /home/docker"
+
+
 
 echo "USER docker"
 echo "CMD /bin/bash"
+echo "WORKDIR /home/docker"
 
 echo "RUN sudo apt-get -y install zip"
 
