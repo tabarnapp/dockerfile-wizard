@@ -1,43 +1,31 @@
 #!/bin/bash
 
-echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
-echo "RUN apt-get update"
+# echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
+echo "FROM circleci/node:8.11.3"
+echo "RUN sudo apt-get update"
+echo "RUN sudo apt-get -y install zip lsb-release unzip"
 
-echo "RUN adduser --disabled-password --gecos '' docker"
-echo "RUN adduser docker sudo"
-echo "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
-echo "RUN mkdir /home/docker"
-echo "RUN chown docker:docker /home/docker"
+# if [ ! -e $RUBY_VERSION_NUM ] ; then
+#     echo "RUN sudo apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
+#     tar -xzvf ruby-$RUBY_VERSION_NUM.tar.gz && \
+#     cd ruby-$RUBY_VERSION_NUM/ && \
+#     ./configure --disable-install-doc && \
+#     make -j4 && \
+#     make install && \
+#     ruby -v"
+# fi
 
-
-
-echo "USER docker"
-echo "CMD /bin/bash"
-echo "WORKDIR /home/docker"
-
-echo "RUN sudo apt-get -y install zip"
-
-if [ ! -e $RUBY_VERSION_NUM ] ; then
-    echo "RUN sudo apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
-    tar -xzvf ruby-$RUBY_VERSION_NUM.tar.gz && \
-    cd ruby-$RUBY_VERSION_NUM/ && \
-    ./configure --disable-install-doc && \
-    make -j4 && \
-    make install && \
-    ruby -v"
-fi
-
-if [ ! -e $NODE_VERSION_NUM ] ; then
-    echo "RUN wget https://nodejs.org/dist/v$NODE_VERSION_NUM/node-v$NODE_VERSION_NUM.tar.gz && \
-    tar -xzvf node-v$NODE_VERSION_NUM.tar.gz && \
-    rm node-v$NODE_VERSION_NUM.tar.gz && \
-    cd node-v$NODE_VERSION_NUM && \
-    ./configure && \
-    make -j4 && \
-    make install && \
-    cd .. && \
-    rm -r node-v$NODE_VERSION_NUM"
-fi
+# if [ ! -e $NODE_VERSION_NUM ] ; then
+#     echo "RUN wget https://nodejs.org/dist/v$NODE_VERSION_NUM/node-v$NODE_VERSION_NUM.tar.gz && \
+#     tar -xzvf node-v$NODE_VERSION_NUM.tar.gz && \
+#     rm node-v$NODE_VERSION_NUM.tar.gz && \
+#     cd node-v$NODE_VERSION_NUM && \
+#     ./configure && \
+#     make -j4 && \
+#     make install && \
+#     cd .. && \
+#     rm -r node-v$NODE_VERSION_NUM"
+# fi
 
 if [ ! -e $PYTHON_VERSION_NUM ] ; then
     echo "RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION_NUM/Python-$PYTHON_VERSION_NUM.tgz && \
@@ -111,42 +99,3 @@ echo "RUN git clone https://github.com/sstephenson/bats.git \
 # install dependencies for tap-to-junit
 echo "RUN perl -MCPAN -e 'install TAP::Parser'"
 echo "RUN perl -MCPAN -e 'install XML::Generator'"
-
-# install lsb-release, etc., for testing linux distro
-echo "RUN sudo apt-get update && sudo apt-get -y install lsb-release unzip"
-
-if [ $BROWSERS = "true" ] ; then
-cat << EOF
-RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
-    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
-    sudo apt-get update && sudo apt-get -y install -t jessie-backports xvfb phantomjs \\
-; else \\
-		sudo apt-get update && sudo apt-get -y install xvfb phantomjs \\
-; fi
-EOF
-echo "ENV DISPLAY :99"
-
-echo "# install firefox
-RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.deb https://s3.amazonaws.com/circle-downloads/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb \
-  && echo 'ef016febe5ec4eaf7d455a34579834bcde7703cb0818c80044f4d148df8473bb  /tmp/firefox.deb' | sha256sum -c \
-  && sudo dpkg -i /tmp/firefox.deb || sudo apt-get -f install  \
-  && sudo apt-get install -y libgtk3.0-cil-dev libasound2 libasound2 libdbus-glib-1-2 libdbus-1-3 \
-  && rm -rf /tmp/firefox.deb"
-
-echo "# install chrome
-RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-  && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
-  && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
-  && sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox --no-sandbox|g' \
-       \"/opt/google/chrome/google-chrome\""
-
-echo "# install chromedriver
-RUN apt-get -y install libgconf-2-4 \
-  && curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip \"http://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip\" \
-  && cd /tmp \
-  && unzip chromedriver_linux64.zip \
-  && rm -rf chromedriver_linux64.zip \
-  && mv chromedriver /usr/local/bin/chromedriver \
-  && chmod +x /usr/local/bin/chromedriver"
-fi
-
