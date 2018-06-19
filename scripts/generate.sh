@@ -3,7 +3,10 @@
 echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
 echo "RUN apt-get update"
 
-echo 'RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo'
+echo "RUN adduser --disabled-password --gecos '' docker"
+echo "RUN adduser docker sudo"
+echo "RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
+
 echo "USER docker"
 echo "CMD /bin/bash"
 
