@@ -6,7 +6,7 @@ image_config: &image_config
 
   IMAGE_NAME: tabarnapp-app-builder
 
-  IMAGE_TAG: latest
+  IMAGE_TAG: nodelts
 
   # NOTE: if you're modifying this config.yml file manually
   # rather than using the included setup script,
@@ -17,7 +17,7 @@ image_config: &image_config
 
   RUBY_VERSION_NUM: 2.4.2
 
-  NODE_VERSION_NUM: 8.9.4
+  NODE_VERSION_NUM: 12.16.1
 
   PYTHON_VERSION_NUM: 2.7.9
 
@@ -54,7 +54,7 @@ jobs:
 
   test_image:
     docker:
-      - image: $DOCKER_USERNAME/tabarnapp-app-builder:latest
+      - image: $DOCKER_USERNAME/tabarnapp-app-builder:nodelts
         environment:
           <<: *image_config
 

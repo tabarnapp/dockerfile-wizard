@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
-echo "FROM circleci/node:8.11.3"
+echo "FROM circleci/node:12.16.1"
 echo "RUN sudo apt-get update"
 echo "RUN sudo apt-get -y install zip lsb-release unzip python-dev python-pip"
 
